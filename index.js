@@ -48,16 +48,47 @@ async function trataRetorno (){
 
                 if(chat.unreadCount == 1){
                 id_naolidos.push(chat.unreadCount,chat.name,chat.id._serialized)
-                    console.log(id_naolidos)
+                   
                 }
             } else {
                //console.log(`${chat.name}: Não possui mensagens não lidas ou é um grupo desativado`);
             }
         });
+        console.log(id_naolidos)
     }).catch(error => {
         console.error("Erro ao buscar chats:", error);
     });
+   
     return id_naolidos
 }
 
-trataRetorno()
+async function trataretornoNew(){
+
+    try {
+
+    const raw = await consultarchats()    
+    const chats = raw.chats;
+    const id_naolidos = []
+    chats.forEach(chat => {
+        if (chat.hasOwnProperty('unreadCount')) { // Verifica se o chat possui a propriedade unreadCount
+            //console.log(`${chat.name}: ${chat.unreadCount} mensagens não lidas id:${chat.id._serialized}`);
+
+            if(chat.unreadCount == 1){
+            id_naolidos.push(chat.unreadCount,chat.name,chat.id._serialized)
+            
+            }
+        } else {
+           //console.log(`${chat.name}: Não possui mensagens não lidas ou é um grupo desativado`);
+        }
+    });
+    console.log(id_naolidos);
+    return id_naolidos;
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+//trataRetorno()
+
+trataretornoNew()
