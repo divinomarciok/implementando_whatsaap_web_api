@@ -35,27 +35,29 @@ async function getChats() {
     }
 }
 
-/*getChats().then(() => {
-    console.log(JSON.stringify(chatsData, null, 2));
-    
-});*/
-
-
 
 async function trataRetorno (){
+
+    const id_naolidos = [];
     consultarchats().then(data => {
         const chats = data.chats; // Obtém o array de chats do JSON
-        console.log(chats)
-       /* chats.forEach(chat => {
+        //console.log(chats)
+       chats.forEach(chat => {
             if (chat.hasOwnProperty('unreadCount')) { // Verifica se o chat possui a propriedade unreadCount
-                console.log(`${chat.name}: ${chat.unreadCount} mensagens não lidas`);
+                //console.log(`${chat.name}: ${chat.unreadCount} mensagens não lidas id:${chat.id._serialized}`);
+
+                if(chat.unreadCount == 1){
+                id_naolidos.push(chat.unreadCount,chat.name,chat.id._serialized)
+                    console.log(id_naolidos)
+                }
             } else {
-                console.log(`${chat.name}: Não possui mensagens não lidas ou é um grupo desativado`);
+               //console.log(`${chat.name}: Não possui mensagens não lidas ou é um grupo desativado`);
             }
-        });*/
+        });
     }).catch(error => {
         console.error("Erro ao buscar chats:", error);
     });
+    return id_naolidos
 }
 
 trataRetorno()
