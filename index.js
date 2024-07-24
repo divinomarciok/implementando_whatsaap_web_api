@@ -70,7 +70,7 @@ async function trataretornoNew() {
         chats.forEach(chat => {
             if (chat.hasOwnProperty('unreadCount')) {
 
-                if (chat.unreadCount == 1) {
+                if (chat.unreadCount != 0) {
                     const atendimento_unreadCount = {
                         unreadCount: chat.unreadCount,
                         name: chat.name,
@@ -113,7 +113,7 @@ async function responde(chatId,resposta) {
 
     fetch("http://localhost:3000/client/sendMessage/f8377d8d-a589-4242-9ba6-9486a04ef80c", requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) => console.log("deu certo"))
         .catch((error) => console.error(error));
 
 }
@@ -123,14 +123,20 @@ async function respondeNaolidos() {
     try {
 
         const naolidos = await trataretornoNew()
-        console.log(naolidos)
+        //console.log(naolidos)
         
         if(naolidos != null){
 
         naolidos.forEach (chat =>{
             const idChat = chat.chatId;
             const body = chat.body;
-            responde(idChat,body);
+
+            let arrayBody = body.split(",");
+
+            console.log(arrayBody)
+            
+            responde(idChat,arrayBody[0]);
+            
         })
     }
         //responde(" VINHO CAMPO LARGO TINTO SUAV\n\nprice: 9,99\nvolume: 1L\nunit: LITRO\nmarca: CAMPO LARGO")
@@ -141,19 +147,10 @@ async function respondeNaolidos() {
 
 }
 
-/*trataretornoNew().then(conversasnaoLidas =>{
-    console.log(conversasnaoLidas)
-    
-})
-.catch(error=> {
-    console.error(error)
-})*/
 
-//setInterval(trataretornoNew,10000)
+//setInterval(trataretornoNew,6000)
 
-//trataretornoNew()
-
-setInterval(respondeNaolidos,10000)
+setInterval(respondeNaolidos,6000)
 
 
 //respondeNaolidos()
@@ -161,3 +158,10 @@ setInterval(respondeNaolidos,10000)
 //getChats()
 
 
+/*let receba = "abacaxi, coca-cola, carne, peixe";
+
+let arrayItens = receba.split(",");
+
+let  item1 = arrayItens[3];
+
+console.log(arrayItens)*/
