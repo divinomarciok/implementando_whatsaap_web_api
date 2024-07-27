@@ -36,16 +36,19 @@ async function getChats() {
 }
 
 
-async function consultaProduto() {
+async function consultaProduto(filtro) {
 
     const myHeaders = new Headers();
-    myHeaders.append("x-api-key", "cursodev1");
+    myHeaders.append("Content-Type", "application/json");
 
-    const formdata = new FormData();
+    const raw = JSON.stringify({
+        "filtro": filtro
+    });
 
     const requestOptions = {
-        method: "GET",
+        method: "POST",
         headers: myHeaders,
+        body: raw,
         redirect: "follow"
     };
 
@@ -54,7 +57,7 @@ async function consultaProduto() {
         const response = await fetch("http://localhost:4000/notifica/consulta", requestOptions);
         const result = await response.json();
 
-        //console.log(result)
+        console.log(result)
         return result;
 
     } catch (error) {
@@ -88,18 +91,18 @@ async function trataRetorno() {
 
 
 
-async function trataretornoNew() {
-   
+async function trataretornoNew(filtro) {
+
     const id_naolidos = []
     try {
 
-        const raw = await consultarchats()
+        const raw = await consultarchats(filtro)
         const chats = raw.chats;
 
         chats.forEach(chat => {
             if (chat.hasOwnProperty('unreadCount')) {
 
-                if (chat.unreadCount == 1) {
+                if (chat.unreadCount != 0) {
                     const atendimento_unreadCount = {
                         unreadCount: chat.unreadCount,
                         name: chat.name,
@@ -124,10 +127,10 @@ async function trataretornoNew() {
 
 
 
-async function trataRetornoProduto() {
+async function trataRetornoProduto(filtro) {
     try {
 
-        const raw = await consultaProduto()
+        const raw = await consultaProduto(filtro)
         const dados = raw.json;
         const produtoSelecionado = [];
 
@@ -149,7 +152,7 @@ async function trataRetornoProduto() {
                 const marcaProduto = produto.marca;
                 const precoProduto = produto.preco;
 
-                if (marcaProduto == "Dona Cota") {
+                if (marcaProduto == filtro) {
                     const objetoVariavel = {
                         OFERTA: "Oferta localizada",
                         Loja: objeto.loja,
@@ -212,12 +215,32 @@ async function respondeNaolidos() {
             naolidos.forEach(chat => {
                 const idChat = chat.chatId;
                 const body = chat.body;
-
                 let arrayBody = body.split(",");
 
-                let resposta = arrayBody[1] + "\n" + arrayBody[0] + "\n" + arrayBody[2]
+                // let resposta = arrayBody[1] + "\n" + arrayBody[0] + "\n" + arrayBody[2]
 
-                responde(idChat, resposta);
+                console.log(body)
+
+                trataRetornoProduto(body)
+                    .then(result => {
+                        console.log(result)
+
+                        const retorno = JSON.stringify(result);
+                        let retornoIdentado = identaRetorno(retorno)
+                        console.log(retornoIdentado)
+                        //responde("556492112609@c.us", retornoIdentado)
+
+                        responde(idChat,retornoIdentado)
+
+                        console.log("deu ruim")
+
+                    })
+                    .catch(error => {
+                        console.error(error)
+                    })
+
+                //console.log(resposta);
+                //responde(idChat, resposta);
 
             })
         }
@@ -244,9 +267,9 @@ function identaRetorno(retorno) {
 
 //setInterval(trataretornoNew,6000)
 
-//setInterval(respondeNaolidos, 6000)
+setInterval(respondeNaolidos, 6000)
 
-trataRetornoProduto()
+/*trataRetornoProduto("Dona Cota")
     .then(result => {
         const retorno = JSON.stringify(result);
 
@@ -257,7 +280,7 @@ trataRetornoProduto()
     .catch(error => {
         console.error(error)
     })
-
+*/
 
 //retornoIdentado
 
