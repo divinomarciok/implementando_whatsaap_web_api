@@ -88,6 +88,41 @@ async function trataRetorno() {
 
 
 
+async function trataretornoNew() {
+   
+    const id_naolidos = []
+    try {
+
+        const raw = await consultarchats()
+        const chats = raw.chats;
+
+        chats.forEach(chat => {
+            if (chat.hasOwnProperty('unreadCount')) {
+
+                if (chat.unreadCount == 1) {
+                    const atendimento_unreadCount = {
+                        unreadCount: chat.unreadCount,
+                        name: chat.name,
+                        chatId: chat.id._serialized,
+                        body: chat.lastMessage._data.body
+                    }
+                    id_naolidos.push(atendimento_unreadCount)
+                } else {
+
+                }
+            };
+        })
+        console.log(JSON.stringify(id_naolidos[0], null, 2));
+        console.log(id_naolidos.length)
+        return id_naolidos;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
+
 
 async function trataRetornoProduto() {
     try {
@@ -99,7 +134,6 @@ async function trataRetornoProduto() {
 
         for (let i = 0; i < dados.length; i++) {
             const objeto = dados[i];
-
 
             const idObjeto = objeto._id;
             const dataFim = objeto.dataFim;
@@ -115,21 +149,23 @@ async function trataRetornoProduto() {
                 const marcaProduto = produto.marca;
                 const precoProduto = produto.preco;
 
-                if (marcaProduto == "Seara") {
+                if (marcaProduto == "Dona Cota") {
                     const objetoVariavel = {
-                         dataFim : objeto.dataFim,
-                         dataInicio : objeto.dataInicio,
-                         loja: objeto.loja,
-                          nomeProduto :produto.nome,
-                          marcaProduto : produto.marca,
-                          precoProduto : precoProduto.replace(',',':')
+                        OFERTA: "Oferta localizada",
+                        Loja: objeto.loja,
+                        Produto: produto.nome,
+                        Marca: produto.marca,
+                        Preço: precoProduto.replace(',', ':'),
+                        DataInicio: objeto.dataFim,
+                        DataFim: objeto.dataInicio,
+                        _id: objeto._id
                     }
                     produtoSelecionado.push(objetoVariavel)
                 }
-               // console.log(`  - Produto: ${nomeProduto}, Marca: ${marcaProduto}, Preço: ${precoProduto}`);
+                // console.log(`  - Produto: ${nomeProduto}, Marca: ${marcaProduto}, Preço: ${precoProduto}`);
             }
         }
-        //console.log(produtoSelecionado);
+
         return produtoSelecionado;
     } catch (error) {
         console.log(error)
@@ -163,16 +199,13 @@ async function responde(chatId, resposta) {
 }
 
 
-async function transformaresposta(){
-    const resposta = await trataRetornoProduto
-}
 
 
 async function respondeNaolidos() {
     try {
 
         const naolidos = await trataretornoNew()
-        //console.log(naolidos)
+
 
         if (naolidos != null) {
 
@@ -188,7 +221,7 @@ async function respondeNaolidos() {
 
             })
         }
-        //responde(" VINHO CAMPO LARGO TINTO SUAV\n\nprice: 9,99\nvolume: 1L\nunit: LITRO\nmarca: CAMPO LARGO")
+
     } catch (error) {
 
         console.log(error)
@@ -196,22 +229,37 @@ async function respondeNaolidos() {
 
 }
 
+function identaRetorno(retorno) {
+
+    let identandoRetorno = retorno.replace(/,/g, '\n')
+    identandoRetorno = identandoRetorno.replace(/}/g, '\n')
+    identandoRetorno = identandoRetorno.replace(/{/g, '\n')
+    identandoRetorno = identandoRetorno.replace(/]/g, '')
+    identandoRetorno = identandoRetorno.replace(/\[/g, '')
+
+    console.log(identandoRetorno);
+    return identandoRetorno
+
+}
 
 //setInterval(trataretornoNew,6000)
 
 //setInterval(respondeNaolidos, 6000)
 
-  trataRetornoProduto()
-  .then(result =>{
-    let retorno = JSON.stringify(result);
-    let identandoRetorno = retorno.replace(/,/g,'\n') 
-    console.log(identandoRetorno)
-   //responde("556492112609@c.us",retorno)
-  })
-  .catch(error=>{
-    console.error(error)
-  })
+trataRetornoProduto()
+    .then(result => {
+        const retorno = JSON.stringify(result);
 
+        let retornoIdentado = identaRetorno(retorno)
+        console.log(retornoIdentado)
+        //responde("556492112609@c.us", retornoIdentado)
+    })
+    .catch(error => {
+        console.error(error)
+    })
+
+
+//retornoIdentado
 
 
 
